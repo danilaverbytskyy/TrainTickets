@@ -1,0 +1,61 @@
+# Временные файлы и базы данных
+*.sqlite3
+*.db
+db.sqlite3
+
+# Файлы окружения
+.env
+.env.local
+.env.prod
+.env.dev
+
+# Статические файлы (если собираются локально)
+/staticfiles/
+/mediafiles/
+
+# Питоновские кэш-файлы
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Файлы IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Логи
+*.log
+logs/
+
+# macOS
+.DS_Store
+
+# Django секретный ключ (если хранится в файле)
+secret_key.txt
+
+# Миграции (раскомментировать если нужно игнорировать)
+# */migrations/*.py
+# !*/migrations/__init__.py
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Pipenv
+Pipfile.lock
+
+# Poetry
+poetry.lock
+
+# Celery
+celerybeat-schedule
