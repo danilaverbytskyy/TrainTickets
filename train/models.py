@@ -11,7 +11,7 @@ class Train(models.Model):
 
     class Meta:
         verbose_name = "Поезд"
-        verbose_name_plural = 'Поезда'
+        verbose_name_plural = 'Поезды'
 
     def __str__(self):
         return self.title

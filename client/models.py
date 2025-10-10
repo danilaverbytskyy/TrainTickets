@@ -5,7 +5,7 @@ class Client(models.Model):
     first_name = models.fields.CharField(max_length=100, blank=True)
     last_name = models.fields.CharField(max_length=100, blank=True)
     patronymic = models.fields.CharField(max_length=100, blank=True)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True)
+    user = models.OneToOneField(User, on_delete=models.SET_NULL, default=None, null=True)
     birth_date = models.DateField()
     passport = models.CharField(max_length=20, blank=True)
     phone = models.CharField(max_length=20, blank=True)
