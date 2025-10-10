@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Профиль клиента{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card mt-5">
+            <div class="card-header bg-primary text-white">
+                <h4 class="card-title mb-0">Профиль клиента</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Контактная информация</h5>
+                        <p><strong>Email:</strong> {{ user.email }}</p>
+                        <p><strong>Телефон:</strong> {{ client.phone|default:"Не указан" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Личная информация</h5>
+                        <p><strong>ФИО:</strong> {{ client.last_name }} {{ client.first_name }} {{ client.patronymic }}</p>
+                        <p><strong>Дата рождения:</strong> {{ client.birth_date|date:"d.m.Y" }}</p>
+                        <p><strong>Паспорт:</strong> {{ client.passport|default:"Не указан" }}</p>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Дата регистрации:</strong> {{ client.created_at|date:"d.m.Y H:i" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Последнее обновление:</strong> {{ client.updated_at|date:"d.m.Y H:i" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

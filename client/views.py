@@ -1,14 +1,14 @@
 from datetime import datetime
+from http.client import HTTPResponse
 
+from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-from django.contrib import messages
 
-from TrainsProject.settings import LOGOUT_REDIRECT_URL
-from client.forms import ClientRegistrationForm, ClientLoginForm, UserUpdateForm, ClientUpdateForm
 from client.models import Client
+from .forms import CustomUserCreationForm, ClientRegistrationForm, CustomAuthenticationForm
 
 
 @staff_member_required
@@ -45,91 +45,80 @@ def show(request, client_id):
 
 
 def register_view(request):
+    if request.user.is_authenticated:
+        return redirect('/')
+
     if request.method == 'POST':
-        form = ClientRegistrationForm(request.POST)
-        if form.is_valid():
+        user_form = CustomUserCreationForm(request.POST)
+        client_form = ClientRegistrationForm(request.POST)
+
+        if user_form.is_valid() and client_form.is_valid():
             # Создаем пользователя
-            user = form.save()
+            user = user_form.save()
 
-            # Создаем клиента
-            client = Client.objects.create(
-                user=user,
-                first_name=form.cleaned_data.get('first_name'),
-                last_name=form.cleaned_data.get('last_name'),
-                patronymic=form.cleaned_data.get('patronymic'),
-                birth_date=form.cleaned_data.get('birth_date'),
-                passport=form.cleaned_data.get('passport'),
-                phone=form.cleaned_data.get('phone')
-            )
+            # Создаем клиента и связываем с пользователем
+            client = client_form.save(commit=False)
+            client.user = user
+            client.save()
 
-            # Обновляем first_name и last_name пользователя
-            user.first_name = form.cleaned_data.get('first_name')
-            user.last_name = form.cleaned_data.get('last_name')
-            user.save()
-
-            username = form.cleaned_data.get('username')
-            messages.success(request, f'Аккаунт {username} был успешно создан! Теперь вы можете войти.')
-            return redirect('login')
+            # Автоматически входим после регистрации
+            login(request, user)
+            messages.success(request, f'Добро пожаловать, {client.first_name}! Регистрация прошла успешно!')
+            return redirect('home')
         else:
-            messages.error(request, 'Пожалуйста, исправьте ошибки в форме.')
+            messages.error(request, 'Пожалуйста, исправьте ошибки в форме')
     else:
-        form = ClientRegistrationForm()
-
-    return render(request, 'client/register.html', {'form': form})
-
-
-def login_view(request):
-    if request.method == 'POST':
-        form = ClientLoginForm(request, data=request.POST)
-        if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                login(request, user)
-                messages.info(request, f"Вы вошли как {username}.")
-                return redirect('profile')
-            else:
-                messages.error(request, "Неверное имя пользователя или пароль.")
-        else:
-            messages.error(request, "Неверное имя пользователя или пароль.")
-    else:
-        form = ClientLoginForm()
-
-    return render(request, 'client/login.html', {'form': form})
-
-
-def logout_view(request):
-    logout(request)
-    messages.info(request, "Вы вышли из системы.")
-    return redirect(LOGOUT_REDIRECT_URL)
-
-
-@login_required
-def profile_view(request):
-    try:
-        client = Client.objects.get(user=request.user)
-    except Client.DoesNotExist:
-        client = None
-
-    if request.method == 'POST':
-        user_form = UserUpdateForm(request.POST, instance=request.user)
-        client_form = ClientUpdateForm(request.POST, instance=client) if client else None
-
-        if user_form.is_valid() and (client_form is None or client_form.is_valid()):
-            user_form.save()
-            if client_form:
-                client_form.save()
-            messages.success(request, 'Ваш профиль был успешно обновлен!')
-            return redirect('profile')
-    else:
-        user_form = UserUpdateForm(instance=request.user)
-        client_form = ClientUpdateForm(instance=client) if client else None
+        user_form = CustomUserCreationForm()
+        client_form = ClientRegistrationForm()
 
     context = {
         'user_form': user_form,
         'client_form': client_form,
+        'title': 'Регистрация'
+    }
+    return render(request, 'client/register.html', context)
+
+
+def login_view(request):
+    if request.user.is_authenticated:
+        return redirect('/')
+
+    if request.method == 'POST':
+        form = CustomAuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            email = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(request, email=email, password=password)
+            if user is not None:
+                login(request, user)
+                messages.success(request, f'Добро пожаловать, {user.client.first_name}!')
+                next_url = request.GET.get('next', 'home')
+                return redirect(next_url)
+        else:
+            messages.error(request, 'Неверный email или пароль')
+    else:
+        form = CustomAuthenticationForm()
+
+    context = {
+        'form': form,
+        'title': 'Вход в систему'
+    }
+    return render(request, 'client/login.html', context)
+
+
+def logout_view(request):
+    logout(request)
+    messages.info(request, 'Вы успешно вышли из системы')
+    return redirect('/')
+
+
+@login_required
+def profile_view(request):
+    client = request.user.client  # Получаем связанного клиента
+    if not client:
+        return HTTPResponse(404)
+    context = {
+        'user': request.user,
         'client': client
     }
-
     return render(request, 'client/profile.html', context)

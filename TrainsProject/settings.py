@@ -126,9 +126,9 @@ STATICFILES_DIRS = [
 # Добавляем в конец settings.py
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
-LOGIN_URL = 'login'
+LOGIN_URL = '/'
 
-AUTH_USER_MODEL = 'auth.User'  # или ваша кастомная модель пользователя
+AUTH_USER_MODEL = 'client.CustomUser'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

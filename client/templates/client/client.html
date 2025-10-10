@@ -1,0 +1,16 @@
+<p style="text-align: center">Количество клиентов: <span style="color: red">{{ clients_count }}</span></p>
+
+{% for client in clients %}
+    <div class="client-box">
+        <h4>{{ client.id }}. {{ client.last_name }} {{ client.first_name }}</h4>
+        <p>{{ client.phone }}</p>
+    </div>
+{% endfor %}
+
+<style>
+    .client-box {
+        border: 2px black dashed;
+        margin: 10px;
+        padding-left: 10px;
+    }
+</style>

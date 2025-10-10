@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Поезда{% endblock %}</title>
+
+    {% load static %}
+    <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet">    <!-- Дополнительные CSS -->
+    <!-- Bootstrap icons-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="css/styles.css" rel="stylesheet" />
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% include "header.html" %}
+
+        {% block content %}
+        <!-- Основной контент -->
+        {% endblock %}
+
+    {% include "footer.html" %}
+
+    <script src="{% static 'js/bootstrap.js' %}"></script>
+    <script src="{% static 'js/bootstrap.bundle.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
